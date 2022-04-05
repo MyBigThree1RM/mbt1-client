@@ -15,6 +15,12 @@ function Measure({navigation}){
   const paintWeight = () => {
     if (weight<=0) {
       alert("The weight must be greater than zero.")
+      setWeight(0);
+      return;
+    }
+    else if (weight % 5 !== 0){
+      alert("The weight must be multiple of 5.")
+      setWeight(0);
       return;
     }
     setIsSubmitted(true);
