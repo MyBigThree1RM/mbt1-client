@@ -8,13 +8,17 @@ import { theme } from "./colors";
 
 const Stack = createStackNavigator();
 
-function Measure({navigation}){
+function Measure({navigation,route}){
+
+  const ex_event = route.params.ex_event
+
   const [weight, setWeight] = useState(0);
   const [reps, setReps] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
 
+  //camera permission
   useEffect(() => {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
@@ -76,8 +80,31 @@ function Measure({navigation}){
         <Text style={styles.repText}>REPS : {reps}</Text>
       </View>
 
-      <TouchableOpacity style={styles.submit}>
+      <TouchableOpacity style={styles.submit} onPress={()=>navigation.navigate('Result',{ex_event:ex_event,weight:weight,reps:reps})}>
         <Text style={styles.submit__text}>COMPLETE</Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
+
+function Result({navigation,route}){
+
+  const data = route.params
+
+  return(
+    <View style={styles.container}>
+      <View style = {{flex:1,justifyContent:"center",alignItems:"center"}}>
+        <Text>UserName</Text>
+      </View>
+      <View style={{...styles.repBox,flex:1}}>
+        <Text style={styles.repText}>Event : {data.ex_event}</Text>
+        <Text style={styles.repText}>Weight : {data.weight}</Text>
+        <Text style={styles.repText}>REPS : {data.reps}</Text>
+        <Text style={styles.repText}>Volume : {data.weight * data.reps}</Text>
+        <Text style={styles.repText}>Estimated 1RM : N-</Text>
+      </View>
+      <TouchableOpacity style={styles.submit}>
+        <Text style={styles.submit__text}>SAVE</Text>
       </TouchableOpacity>
     </View>
   )
@@ -86,13 +113,13 @@ function Measure({navigation}){
 function Select({navigation}){
   return(
     <View style={{flex:1, paddingHorizontal:20, justifyContent:"space-evenly"}}>
-      <TouchableOpacity style={styles.btn} onPress={()=>navigation.navigate('Measurement')}>
+      <TouchableOpacity style={styles.btn} onPress={()=>navigation.navigate('Measurement',{ex_event:"Squat",})}>
         <Text style={styles.btnText}>Squat</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.btn} onPress={()=>navigation.navigate('Measurement')}>
+      <TouchableOpacity style={styles.btn} onPress={()=>navigation.navigate('Measurement',{ex_event:"BenchPress",})}>
         <Text style={styles.btnText}>BenchPress</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.btn} onPress={()=>navigation.navigate('Measurement')}>
+      <TouchableOpacity style={styles.btn} onPress={()=>navigation.navigate('Measurement',{ex_event:"Deadlift",})}>
         <Text style={styles.btnText}>Deadlift</Text>
       </TouchableOpacity>
     </View>
@@ -105,6 +132,7 @@ export default function App() {
       <Stack.Navigator>
         <Stack.Screen name = "Select" component={Select}/>
         <Stack.Screen name = "Measurement" component={Measure} />
+        <Stack.Screen name = "Result" component={Result} />
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
