@@ -3,10 +3,15 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
+
 import { Camera } from 'expo-camera';
+import {WebView} from 'react-native-webview';
+
 import { theme } from "./colors";
 
 const Stack = createStackNavigator();
+const PORT = 8888
+const defURL = `http://localhost:${PORT}`
 
 function Measure({navigation,route}){
 
@@ -48,8 +53,13 @@ function Measure({navigation,route}){
   }
   const onChangeWeight = (w) => setWeight(w);
 
+  const handleOnMessage = (e)=>{
+    console.log(e.nativeEvent.data);
+  };
+
   return(
     <View style={styles.container}>
+      {/*
       <Camera style={styles.camera} type={type}>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
@@ -65,7 +75,15 @@ function Measure({navigation,route}){
           </TouchableOpacity>
         </View>
       </Camera>
-
+      */}
+      <WebView
+        source={{uri:`${defURL}/video_feed`}}
+        onMessage={handleOnMessage}
+        javaScriptEnabled={true}
+        automaticallyAdjustContentInsets={false}
+        scrollEnabled={false}
+        style={{flex:1,width:400}}
+      />
       <View style={styles.repBox}>
         <View style={{flex:0.7, flexDirection:"row",alignItems:"center"}}>
           <Text style={styles.repText}>Weight : </Text>
