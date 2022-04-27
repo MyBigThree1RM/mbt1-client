@@ -2,15 +2,15 @@ import React,{useState,useEffect} from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
 
 import { Camera } from 'expo-camera';
-import {WebView} from 'react-native-webview';
+import { WebView } from 'react-native-webview';
 
 import { theme } from "./colors";
 
 const Stack = createStackNavigator();
-const PORT = 8888
+const PORT = 8000
 const defURL = `http://localhost:${PORT}`
 
 function Measure({navigation,route}){
@@ -20,24 +20,24 @@ function Measure({navigation,route}){
   const [weight, setWeight] = useState(0);
   const [reps, setReps] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [hasPermission, setHasPermission] = useState(null);
-  const [type, setType] = useState(Camera.Constants.Type.back);
+  //const [hasPermission, setHasPermission] = useState(null);
+  //const [type, setType] = useState(Camera.Constants.Type.back);
 
   //camera permission
-  useEffect(() => {
+  /*useEffect(() => {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
     })();
   }, []);
-
+  
   if (hasPermission === null) {
     return <View />;
   }
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
-
+  */
   const paintWeight = () => {
     if (weight<=0) {
       alert("The weight must be greater than zero.")
@@ -57,33 +57,51 @@ function Measure({navigation,route}){
     console.log(e.nativeEvent.data);
   };
 
+  const getReps = async () => {
+    try{
+      const response = await fetch(`${defURL}/reps`);
+      const json = await response.json();
+      setReps(json.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(()=>{setInterval(()=>{
+    getReps(),1000
+  })}
+  );
+
   return(
     <View style={styles.container}>
       {/*
       <Camera style={styles.camera} type={type}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              setType(
-                type === Camera.Constants.Type.back
-                  ? Camera.Constants.Type.front
-                  : Camera.Constants.Type.back
-              );
-            }}>
-            <Text style={styles.text}> Flip </Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                setType(
+                  type === Camera.Constants.Type.back
+                    ? Camera.Constants.Type.front
+                    : Camera.Constants.Type.back
+                );
+              }}>
+              <Text style={styles.text}> Flip </Text>
+            </TouchableOpacity>
+          </View>
       </Camera>
       */}
-      <WebView
-        source={{uri:`${defURL}/video_feed`}}
-        onMessage={handleOnMessage}
-        javaScriptEnabled={true}
-        automaticallyAdjustContentInsets={false}
-        scrollEnabled={false}
-        style={{flex:1,width:400}}
-      />
+      {isSubmitted ? (
+        <WebView
+          source={{uri:`${defURL}/video_feed`}}
+          onMessage={handleOnMessage}
+          javaScriptEnabled={true}
+          automaticallyAdjustContentInsets={false}
+          scrollEnabled={false}
+          style={{flex:1,width:400}}
+        /> ) 
+        : <ActivityIndicator/>
+      }
       <View style={styles.repBox}>
         <View style={{flex:0.7, flexDirection:"row",alignItems:"center"}}>
           <Text style={styles.repText}>Weight : </Text>
@@ -106,8 +124,58 @@ function Measure({navigation,route}){
 }
 
 function Result({navigation,route}){
-
   const data = route.params
+
+  const oneRM = (w,r) => {
+    let best = 0
+    
+    if (r >= 12)  
+        best = w / (0.7)
+    else if (r === 11)
+        best = w / (0.73)
+    else if (r == 10)
+        best = w / (0.75)
+    else if (r == 9
+)        best = w / (0.77)
+    else if (r == 8
+)        best = w / (0.80)
+    else if (r == 7
+)        best = w / (0.83)
+    else if (r == 6
+)        best = w / (0.85)
+    else if (r == 5
+)        best = w / (0.87)
+    else if (r == 4
+)        best = w / (0.90)
+    else if (r == 3
+)        best = w / (0.93)
+    else if (r == 2
+)        best = w / (0.95)
+    else if (r == 1
+)        best = w
+
+    return Math.round(best)
+  }
+
+  const jsonToServer = () => {
+    const result = {
+      event : data.ex_event,
+      weight : data.weight,
+      reps : data.reps,
+      volume : data.weight * data.reps,
+      oneRM : oneRM(data.weight, data.reps)
+    }
+    json = JSON.stringify(result);
+
+    fetch(`${defURL}/result`,{
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: json
+    });
+  }
 
   return(
     <View style={styles.container}>
@@ -119,9 +187,9 @@ function Result({navigation,route}){
         <Text style={styles.repText}>Weight : {data.weight}</Text>
         <Text style={styles.repText}>REPS : {data.reps}</Text>
         <Text style={styles.repText}>Volume : {data.weight * data.reps}</Text>
-        <Text style={styles.repText}>Estimated 1RM : N-</Text>
+        <Text style={styles.repText}>Estimated 1RM : {oneRM(data.weight,data.reps)}</Text>
       </View>
-      <TouchableOpacity style={styles.submit}>
+      <TouchableOpacity style={styles.submit} onPress={jsonToServer()}>
         <Text style={styles.submit__text}>SAVE</Text>
       </TouchableOpacity>
     </View>
