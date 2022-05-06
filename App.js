@@ -4,14 +4,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
 
-import MeasureNavigator from'./routes/MeasureNavigator';
+import HomeBottomNavigator from'./routes/HomeBottomNavigator';
 
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <MeasureNavigator />
+      <HomeBottomNavigator />
       <StatusBar style="auto" />
     </NavigationContainer>
   );
