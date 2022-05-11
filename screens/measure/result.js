@@ -86,7 +86,7 @@ export default function Result({navigation,route}){
             jsonToServer().then(() => {
                  goBack();
             })
-            .catch(error => console.log(error)) //do something in case onSignIn fails 
+            .catch(error => console.log(error))
           }} 
           >
           <Text style={styles.submit__text}>SAVE</Text>
