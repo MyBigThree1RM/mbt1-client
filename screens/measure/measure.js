@@ -1,6 +1,7 @@
 import React,{useState,useEffect} from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
 
@@ -58,17 +59,23 @@ export default function Measure({navigation,route}){
   
     const getReps = async () => {
       try{
-        const response = await fetch(`${defURL}/reps`);
+        const response = await fetch(`${defURL}/reps/${ex_event}`);
         const json = await response.json();
         setReps(json.data);
       } catch (error) {
         console.log(error);
       }
     }
-  
-    useEffect(()=>{setInterval(()=>{
-      getReps(),1000
-    })},[reps]
+
+    useFocusEffect(
+      React.useCallback(() => {
+        let isActive = true;
+        const req_reps = setInterval(getReps,2000)
+        return () => {
+          clearInterval(req_reps)
+          isActive = false;
+        };
+      }, [])
     );
   
     return(
@@ -92,7 +99,7 @@ export default function Measure({navigation,route}){
         */}
         {isSubmitted ? (
           <WebView
-            source={{uri:`${defURL}/video_feed`}}
+            source={{uri:`${defURL}/${ex_event}`}}
             onMessage={handleOnMessage}
             javaScriptEnabled={true}
             automaticallyAdjustContentInsets={false}
@@ -115,7 +122,11 @@ export default function Measure({navigation,route}){
           <Text style={styles.repText}>REPS : {reps}</Text>
         </View>
   
-        <TouchableOpacity style={styles.submit} onPress={()=>navigation.navigate('Result',{ex_event:ex_event,weight:weight,reps:reps})}>
+        <TouchableOpacity 
+          style={styles.submit} 
+          onPress={()=>{
+            navigation.navigate('Result',{ex_event:ex_event,weight:weight,reps:reps})
+          }}>
           <Text style={styles.submit__text}>COMPLETE</Text>
         </TouchableOpacity>
       </View>

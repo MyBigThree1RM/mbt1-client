@@ -6,6 +6,9 @@ import { StyleSheet, Text, View, TouchableOpacity, TextInput, ActivityIndicator 
 
 import { theme } from "./../../styles/colors.js"; 
 
+const PORT = 8000
+const defURL = `http://localhost:${PORT}`
+
 export default function Result({navigation,route}){
     const data = route.params
   
@@ -39,8 +42,8 @@ export default function Result({navigation,route}){
   
       return Math.round(best)
     }
-  
-    const jsonToServer = () => {
+
+    const jsonToServer = async () => {
       const result = {
         event : data.ex_event,
         weight : data.weight,
@@ -59,7 +62,12 @@ export default function Result({navigation,route}){
         body: json
       });
     }
-  
+    const goBack = () => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Select' }],
+      });
+    }
     return(
       <View style={styles.container}>
         <View style = {{flex:1,justifyContent:"center",alignItems:"center"}}>
@@ -72,7 +80,15 @@ export default function Result({navigation,route}){
           <Text style={styles.repText}>Volume : {data.weight * data.reps}</Text>
           <Text style={styles.repText}>Estimated 1RM : {oneRM(data.weight,data.reps)}</Text>
         </View>
-        <TouchableOpacity style={styles.submit} onPress={jsonToServer}>
+        <TouchableOpacity 
+          style={styles.submit} 
+          onPress={()=>{ 
+            jsonToServer().then(() => {
+                 goBack();
+            })
+            .catch(error => console.log(error)) //do something in case onSignIn fails 
+          }} 
+          >
           <Text style={styles.submit__text}>SAVE</Text>
         </TouchableOpacity>
       </View>
