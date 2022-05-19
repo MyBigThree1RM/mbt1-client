@@ -97,9 +97,11 @@ export default function User() {
 
     useEffect(()=>{
         getBaseinfo();
-        getSquatRecords();
-        getBenchRecords();
-        getDeadRecords();
+        getSquatRecords().then(()=>{
+            getBenchRecords().then(()=>{
+                getDeadRecords();
+            })
+        });
     },[]);
 
     return(
