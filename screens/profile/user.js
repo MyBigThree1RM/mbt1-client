@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {StyleSheet ,View, Text} from 'react-native';
 import PureChart from 'react-native-pure-chart';
-import { backgroundColor } from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes';
 
 import { theme } from "./../../styles/colors.js"; 
+
+const PORT = 8000
+const defURL = `http://localhost:${PORT}`
 
 export default function User() {
     const [username, setUsername] = useState("undefined");
@@ -11,50 +13,98 @@ export default function User() {
     const [squat1RM, setSquat1RM] = useState(0);
     const [dead1RM, setDead1RM] = useState(0);
     const [bench1RM, setBench1RM] = useState(0);
-    
+
+    const getBaseinfo = async () => {
+        try{
+          const response = await fetch(`${defURL}/profile/Total`);
+          const json = await response.json();
+          setUsername(json.data.User);
+          setTotal(json.data.Total);
+          setSquat1RM(json.data.S);
+          setBench1RM(json.data.B);
+          setDead1RM(json.data.D);
+        } catch (error) {
+          console.log(error);
+        }
+    }
+
+    const [squatRecords, setSquatRecords] = useState([]);
+
+    const getSquatRecords = async () =>{
+        try{
+            const response = await fetch(`${defURL}/profile/Squat`);
+            const json = await response.json();
+            const datas = json.data;
+            const ret = [];
+            Object.entries(datas).forEach(([key,value])=>{
+                ret.push({x:key, y:value})
+            });
+            setSquatRecords(ret)
+          } catch (error) {
+            console.log(error);
+          }
+    }
+
+    const [benchRecords, setBenchRecords] = useState([]);
+
+    const getBenchRecords = async () =>{
+        try{
+            const response = await fetch(`${defURL}/profile/BenchPress`);
+            const json = await response.json();
+            const datas = json.data;
+            const ret = [];
+            Object.entries(datas).forEach(([key,value])=>{
+                ret.push({x:key, y:value})
+            });
+            setBenchRecords(ret)
+          } catch (error) {
+            console.log(error);
+          }
+    }
+    const [deadRecords, setDeadRecords] = useState([]);
+
+    const getDeadRecords = async () =>{
+        try{
+            const response = await fetch(`${defURL}/profile/Deadlift`);
+            const json = await response.json();
+            const datas = json.data;
+            const ret = [];
+            Object.entries(datas).forEach(([key,value])=>{
+                ret.push({x:key, y:value})
+            });
+            setDeadRecords(ret)
+          } catch (error) {
+            console.log(error);
+          }
+    }
     let sampleData = [
         {
             seriesName: 'Squat',
-            data: [
-                {x: '22-05-05', y: 21},
-                {x: '22-05-07', y: 84},
-                {x: '22-05-13', y: 32},
-                {x: '22-05-15', y: 100},
-                {x: '22-05-18', y: 108},
-                {x: '22-05-21', y: 44},
-                {x: '22-05-26', y: 58},
-            ],
+            data: squatRecords,
             color: theme.red
         },
         {
             seriesName: 'BenchPress',
-            data: [
-                {x: '22-05-02', y: 10},
-                {x: '22-05-09', y: 32},
-                {x: '22-05-17', y: 44},
-                {x: '22-05-18', y: 215},
-                {x: '22-05-28', y: 21},
-            ],
+            data: benchRecords,
             color: theme.yellow
         },
         {
             seriesName: 'Deadlift',
-            data: [
-                {x: '22-05-03', y: 10},
-                {x: '22-05-07', y: 71},
-                {x: '22-05-10', y: 44},
-                {x: '22-05-14', y: 21},
-                {x: '22-05-16', y: 58},
-                {x: '22-05-18', y: 316},
-                {x: '22-05-21', y: 32},
-            ],
+            data: deadRecords,
             color: theme.blue
         },
     ]
 
+    useEffect(()=>{
+        getBaseinfo();
+        getSquatRecords();
+        getBenchRecords();
+        getDeadRecords();
+    },[]);
+
     return(
         <View style = {styles.container}>
-            <View style = {styles.header}>
+            <View style = {styles.headerBox}>
                 <View>
                     <Text style={styles.name__font}>{username}님, Get In Shape!</Text>
                 </View>
@@ -62,22 +112,21 @@ export default function User() {
                     <Text style={styles.total__font}>Total {total}</Text>
                 </View>
             </View>
-            <View style = {styles.body}>
-                <View style = {{...styles.container, ...styles.body__container, backgroundColor: theme.red}}>
+            <View style = {styles.bodyBox}>
+                <View style = {{...styles.container, ...styles.bodyBox__container, backgroundColor: theme.red}}>
                     <Text style={styles.event__font}>Squat</Text>
                     <Text style={styles.oneRM__font}>{squat1RM}</Text>
                 </View>
-                <View style = {{...styles.container, ...styles.body__container, backgroundColor:theme.yellow}}>
+                <View style = {{...styles.container, ...styles.bodyBox__container, backgroundColor:theme.yellow}}>
                     <Text style={styles.event__font}>BenchPress</Text> 
                     <Text style={styles.oneRM__font}>{bench1RM}</Text>
                 </View>
-                <View style = {{...styles.container, ...styles.body__container, backgroundColor:theme.blue}}>
+                <View style = {{...styles.container, ...styles.bodyBox__container, backgroundColor:theme.blue}}>
                     <Text style={styles.event__font}>Deadlift</Text>
                     <Text style={styles.oneRM__font}>{dead1RM}</Text>
                 </View>
             </View>
-            <View style={styles.footer}>
-                <Text>일주일 기록</Text>
+            <View style={styles.footerBox}>
                 <PureChart 
                     data={sampleData} 
                     type='line'
@@ -95,7 +144,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
     },
-    header:{
+    headerBox:{
         flex:1,
         width:'100%',
         justifyContent:'center',
@@ -108,11 +157,11 @@ const styles = StyleSheet.create({
     total__font:{
         fontSize:40
     }, 
-    body:{
+    bodyBox:{
         flex:1,
         flexDirection:'row',
     },
-    body__container:{
+    bodyBox__container:{
         borderRadius:20,
         margin:5,
     },
@@ -124,7 +173,7 @@ const styles = StyleSheet.create({
         fontSize:30,
         color:'white'
     }, 
-    footer:{
+    footerBox:{
         flex:2,
         width:'100%',
         padding:20,
