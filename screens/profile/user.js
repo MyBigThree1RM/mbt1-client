@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {StyleSheet ,View, Text} from 'react-native';
+import { useFocusEffect } from "@react-navigation/native";
 import PureChart from 'react-native-pure-chart';
 
 import { theme } from "./../../styles/colors.js"; 
@@ -95,14 +96,24 @@ export default function User() {
         },
     ]
 
-    useEffect(()=>{
+    /*useEffect(()=>{
         getBaseinfo();
         getSquatRecords().then(()=>{
             getBenchRecords().then(()=>{
                 getDeadRecords();
             })
         });
-    },[]);
+    });*/
+    useFocusEffect(
+        React.useCallback(() => {
+            getBaseinfo();
+            getSquatRecords().then(()=>{
+                getBenchRecords().then(()=>{
+                    getDeadRecords();
+                })
+            });
+        }, [])
+    );
 
     return(
         <View style = {styles.container}>
@@ -128,6 +139,7 @@ export default function User() {
                     <Text style={styles.oneRM__font}>{dead1RM}</Text>
                 </View>
             </View>
+            {/*              
             <View style={styles.footerBox}>
                 <PureChart 
                     data={sampleData} 
@@ -135,6 +147,7 @@ export default function User() {
                     width={'100%'}
                 />
             </View>
+             */}
         </View>
     )
 }
