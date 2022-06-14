@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
+import * as Speech from 'expo-speech';
 
 import { Camera } from 'expo-camera';
 import { WebView } from 'react-native-webview';

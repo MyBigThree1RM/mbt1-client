@@ -138,16 +138,14 @@ export default function User() {
                     <Text style={styles.event__font}>Deadlift</Text>
                     <Text style={styles.oneRM__font}>{dead1RM}</Text>
                 </View>
-            </View>
-            {/*              
-            <View style={styles.footerBox}>
+            </View>             
+            {/* <View style={styles.footerBox}>
                 <PureChart 
                     data={sampleData} 
                     type='line'
                     width={'100%'}
                 />
-            </View>
-             */}
+            </View> */}
         </View>
     )
 }

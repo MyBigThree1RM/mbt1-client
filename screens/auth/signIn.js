@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
+import { Alert } from "react-native";
 import {
   StyleSheet,
   Text,
@@ -11,11 +12,31 @@ import {
 } from "react-native";
 
 import { theme } from "../../styles/colors.js";
+//import { signIn } from "../../lib/auth";
  
-export default function SignIn() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function SignIn({navigation}) {
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
  
+  const signInSubmit = async () => { // 로그인 함수
+    const {email, password} = form;
+    const info = {email, password};
+    try {
+      const {user} = await signIn(info);
+      console.log(info);
+    } catch (e) {
+      Alert.alert("로그인에 실패하였습니다.");
+    }
+  }
+
+  // const signInSubmit = async () =>{
+  //   console.log("hi");
+  // }
+
   return (
     <View style={styles.container}>
       <Image style={styles.image} source={require("../../assets/fitness.png")} />
@@ -26,7 +47,8 @@ export default function SignIn() {
           style={styles.TextInput}
           placeholder="Email"
           placeholderTextColor="#fff"
-          onChangeText={(email) => setEmail(email)}
+          autoCapitalize = 'none'
+          onChangeText={(txt) => setForm((prev)=>({...prev,email:txt}))}
         />
       </View>
  
@@ -36,15 +58,16 @@ export default function SignIn() {
           placeholder="Password"
           placeholderTextColor="#fff"
           secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
+          autoCapitalize = 'none'
+          onChangeText={(txt) => setForm((prev)=>({...prev,password:txt}))}
         />
       </View>
- 
-      <TouchableOpacity>
-        <Text style={styles.forgot_button}>Forgot Password?</Text>
+
+      <TouchableOpacity onPress={()=>{navigation.navigate('SignUp')}}>
+        <Text style={styles.forgot_button}>Sign up?</Text>
       </TouchableOpacity>
  
-      <TouchableOpacity style={styles.loginBtn}>
+      <TouchableOpacity style={styles.loginBtn} onPress={signInSubmit}>
         <Text style={styles.loginText}>LOGIN</Text>
       </TouchableOpacity>
     </View>
