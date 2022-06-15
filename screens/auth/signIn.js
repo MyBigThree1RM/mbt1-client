@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import { Alert } from "react-native";
 import {
   StyleSheet,
@@ -12,9 +12,15 @@ import {
 } from "react-native";
 
 import { theme } from "../../styles/colors.js";
+import { UserInfo } from "../../App.js";
 //import { signIn } from "../../lib/auth";
+
+const PORT = 8000
+const defURL = `http://localhost:${PORT}`
  
 export default function SignIn({navigation}) {
+
+  const infos = React.useContext(UserInfo);
 
   const [form, setForm] = useState({
     email: "",
@@ -24,18 +30,32 @@ export default function SignIn({navigation}) {
  
   const signInSubmit = async () => { // 로그인 함수
     const {email, password} = form;
-    const info = {email, password};
     try {
-      const {user} = await signIn(info);
-      console.log(info);
+      const result = await fetch(`${defURL}/login`,{
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({UID:email,UPW:password})
+      })
+      .then((response)=>{
+        console.log(response)
+      })
     } catch (e) {
-      Alert.alert("로그인에 실패하였습니다.");
+      console.log(e);
     }
   }
-
-  // const signInSubmit = async () =>{
-  //   console.log("hi");
-  // }
+  const signInResult = async () => {
+    try{
+      const response = await fetch(`${defURL}/login`,);
+      console.log(response.data);
+      const json = await response.text();
+      console.log(json)
+    } catch (error) {
+      //console.log(error);
+    }
+}
 
   return (
     <View style={styles.container}>
@@ -67,7 +87,7 @@ export default function SignIn({navigation}) {
         <Text style={styles.forgot_button}>Sign up?</Text>
       </TouchableOpacity>
  
-      <TouchableOpacity style={styles.loginBtn} onPress={signInSubmit}>
+      <TouchableOpacity style={styles.loginBtn} onPress={()=>{signInSubmit().then(()=>{signInResult()})}}>
         <Text style={styles.loginText}>LOGIN</Text>
       </TouchableOpacity>
     </View>

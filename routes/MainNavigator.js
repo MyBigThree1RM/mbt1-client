@@ -9,11 +9,12 @@ import Splash from '../screens/home/splash';
 import AuthStackNavigator from './AuthStackNavigator';
 import HomeBottomNavigator from './HomeBottomNavigator';
 
+import {UserInfo} from '../App.js';
+
 export default ()=> {
 
-    const Stack = createStackNavigator()    
-
-    const [isSignedIn, setIsSignedIn] = React.useState(false);
+    const Stack = createStackNavigator()
+    const infos = React.useContext(UserInfo);
 
     return (
         <Stack.Navigator
@@ -21,7 +22,7 @@ export default ()=> {
               headerShown: false,
             }}>
             
-            {isSignedIn ? (
+            {infos.isSignedIn ? (
               // 로그인되어있음, main 화면으로
               <Stack.Screen name="HomeBottomNavigator" component={HomeBottomNavigator} />
             ) : (
