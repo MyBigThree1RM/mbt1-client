@@ -73,9 +73,9 @@ export default function Result({navigation,route}){
     return(
       <View style={styles.container}>
         <View style = {{flex:1,justifyContent:"center",alignItems:"center"}}>
-          <Text>UserName</Text>
+          <Text style={{fontSize:30}}>{infos.userID}님 운동결과</Text>
         </View>
-        <View style={{...styles.repBox,flex:1}}>
+        <View style={{...styles.repBox,flex:2}}>
           <Text style={styles.repText}>Event : {data.ex_event}</Text>
           <Text style={styles.repText}>Weight : {data.weight}</Text>
           <Text style={styles.repText}>REPS : {data.reps}</Text>
@@ -119,14 +119,14 @@ export default function Result({navigation,route}){
       flex:0.2,
       width:"90%",
       borderRadius:20,
-      justifyContent:"center",
+      justifyContent:"space-evenly",
       alignItems:"flex-start",
       padding:20,
       marginVertical:20,
       backgroundColor: theme.grey
     },
     repText:{
-      fontSize:18,
+      fontSize:20,
     },
     submit:{
       flex:0.05,
