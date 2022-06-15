@@ -31,7 +31,7 @@ export default function SignIn({navigation}) {
   const signInSubmit = async () => { // 로그인 함수
     const {email, password} = form;
     try {
-      const result = await fetch(`${defURL}/login`,{
+      await fetch(`${defURL}/login`,{
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -39,23 +39,18 @@ export default function SignIn({navigation}) {
         },
         body: JSON.stringify({UID:email,UPW:password})
       })
-      .then((response)=>{
-        console.log(response)
-      })
+      .then((response) => response.json())
+      .then((data) => infos.isSignedIn=data.loginStat);
     } catch (e) {
       console.log(e);
     }
-  }
-  const signInResult = async () => {
-    try{
-      const response = await fetch(`${defURL}/login`,);
-      console.log(response.data);
-      const json = await response.text();
-      console.log(json)
-    } catch (error) {
-      //console.log(error);
+    if (infos.isSignedIn){
+      infos.userID=email;
+      Alert.alert(`${infos.userID}님 환영합니다`)
+      navigation.navigate('HomeBottomNavigator')
     }
-}
+    else Alert.alert(`ID 또는 비밀번호를 잘못 입력했습니다.\n입력하신 내용을 다시 확인해 주세요.`)
+  }
 
   return (
     <View style={styles.container}>
@@ -87,7 +82,7 @@ export default function SignIn({navigation}) {
         <Text style={styles.forgot_button}>Sign up?</Text>
       </TouchableOpacity>
  
-      <TouchableOpacity style={styles.loginBtn} onPress={()=>{signInSubmit().then(()=>{signInResult()})}}>
+      <TouchableOpacity style={styles.loginBtn} onPress={signInSubmit}>
         <Text style={styles.loginText}>LOGIN</Text>
       </TouchableOpacity>
     </View>
