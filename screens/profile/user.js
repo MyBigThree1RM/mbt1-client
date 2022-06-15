@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {StyleSheet ,View, Text} from 'react-native';
+import {StyleSheet ,View, Text, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from "@react-navigation/native";
 import PureChart from 'react-native-pure-chart';
 
@@ -13,6 +13,8 @@ const defURL = `http://localhost:${PORT}`
 export default function User() {
 
     const infos = React.useContext(UserInfo);
+
+    const [isLoading, setIsLoading] = useState(true);
 
     const [username, setUsername] = useState(infos.userID);
     const [total, setTotal] = useState(0);
@@ -113,15 +115,23 @@ export default function User() {
     useFocusEffect(
         React.useCallback(() => {
             getBaseinfo();
+            const timeout = setTimeout(()=>{
+                setIsLoading(false);
+            },500);
+
             getSquatRecords().then(()=>{
                 getBenchRecords().then(()=>{
                     getDeadRecords();
                 })
             });
+
+            return () => {
+                clearTimeout(timeout);
+            }
         }, [])
     );
 
-    return(
+    return isLoading ? <ActivityIndicator style={{flex:1}} size='large' /> :(
         <View style = {styles.container}>
             <View style = {styles.headerBox}>
                 <View>
@@ -145,13 +155,13 @@ export default function User() {
                     <Text style={styles.oneRM__font}>{dead1RM}</Text>
                 </View>
             </View>             
-            {/* <View style={styles.footerBox}>
+            <View style={styles.footerBox}>
                 <PureChart 
                     data={chartData} 
                     type='line'
                     width={'100%'}
                 />
-            </View>  */}
+            </View>
         </View>
     )
 }
@@ -195,6 +205,7 @@ const styles = StyleSheet.create({
     footerBox:{
         flex:2,
         width:'100%',
+        height:'100%',
         padding:20,
         justifyContent:'center'
     }
