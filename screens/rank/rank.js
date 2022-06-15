@@ -5,7 +5,6 @@ import {WebView} from 'react-native-webview';
 import NaverMapView, {Circle, Marker, Path, Polyline, Polygon} from "react-native-nmap";
 
 import { theme } from '../../styles/colors';
-import { getBatteryLevel } from 'react-native-device-info';
 
 const PORT = 8000
 const defURL = `http://localhost:${PORT}`
@@ -54,8 +53,11 @@ export default function Rank() {
     return (
         <View style={styles.container}>
             <View style={{flex:2,justifyContent:'center',alignItems:'center'}}>
-{/* 
-                <NaverMapView style={{width: '100%', height: '100%'}}
+                <WebView
+                    source={{uri:`${defURL}/map`}}
+                    style={{flex:1,width:400}}
+                />
+                {/* <NaverMapView style={{width: '100%', height: '100%'}}
                                     showsMyLocationButton={true}
                                     center={{...P0, zoom: 16}}
                                     onTouch={e => console.warn('onTouch', JSON.stringify(e.nativeEvent))}
@@ -68,9 +70,9 @@ export default function Rank() {
                     <Polyline coordinates={[P1, P2]} onClick={() => console.warn('onClick! polyline')}/>
                     <Circle coordinate={P0} color={"rgba(255,0,0,0.3)"} radius={200} onClick={() => console.warn('onClick! circle')}/>
                     <Polygon coordinates={[P0, P1, P2]} color={`rgba(0, 0, 0, 0.5)`} onClick={() => console.warn('onClick! polygon')}/>
-                </NaverMapView> 
- */}
+                </NaverMapView>  */}
             </View>
+            <Text style={{fontSize:20}}>Ranking</Text>
             {
             isLoading ? <ActivityIndicator/> :(
                 <FlatList
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
     },
     rankBox:{
         flex:1,
-        backgroundColor: 'tomato',
+        backgroundColor: 'white',
         width:'100%',
         height:'100%',
     },
