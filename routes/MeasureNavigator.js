@@ -11,7 +11,7 @@ const Stack = createStackNavigator();
 
 export default () => {
     return(
-        <Stack.Navigator>
+        <Stack.Navigator screenOptions={{headerLeft:null}}>
             <Stack.Screen name = "Select" component={Select}/>
             <Stack.Screen name = "Measurement" component={Measure} />
             <Stack.Screen name = "Result" component={Result} />

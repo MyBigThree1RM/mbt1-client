@@ -145,13 +145,13 @@ export default function User() {
                     <Text style={styles.oneRM__font}>{dead1RM}</Text>
                 </View>
             </View>             
-            <View style={styles.footerBox}>
+            {/* <View style={styles.footerBox}>
                 <PureChart 
                     data={chartData} 
                     type='line'
                     width={'100%'}
                 />
-            </View> 
+            </View>  */}
         </View>
     )
 }
