@@ -5,12 +5,14 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
 
 import { theme } from "./../../styles/colors.js"; 
+import { UserInfo } from "../../App.js";
 
 const PORT = 8000
 const defURL = `http://localhost:${PORT}`
 
 export default function Result({navigation,route}){
     const data = route.params
+    const infos = React.useContext(UserInfo);
   
     const oneRM = (w,r) => {
       let best = 0
@@ -53,7 +55,7 @@ export default function Result({navigation,route}){
       }
       json = JSON.stringify(result);
   
-      fetch(`${defURL}/result`,{
+      fetch(`${defURL}/result/${infos.userID}`,{
         method: 'POST',
         headers: {
           Accept: 'application/json',

@@ -5,11 +5,16 @@ import PureChart from 'react-native-pure-chart';
 
 import { theme } from "./../../styles/colors.js"; 
 
+import { UserInfo } from '../../App.js';
+
 const PORT = 8000
 const defURL = `http://localhost:${PORT}`
 
 export default function User() {
-    const [username, setUsername] = useState("undefined");
+
+    const infos = React.useContext(UserInfo);
+
+    const [username, setUsername] = useState(infos.userID);
     const [total, setTotal] = useState(0);
     const [squat1RM, setSquat1RM] = useState(0);
     const [dead1RM, setDead1RM] = useState(0);
@@ -17,7 +22,7 @@ export default function User() {
 
     const getBaseinfo = async () => {
         try{
-          const response = await fetch(`${defURL}/profile/Total`);
+          const response = await fetch(`${defURL}/profile/Total/${username}`);
           const json = await response.json();
           setUsername(json.data.User);
           setTotal(json.data.Total);
@@ -33,7 +38,7 @@ export default function User() {
 
     const getSquatRecords = async () =>{
         try{
-            const response = await fetch(`${defURL}/profile/Squat`);
+            const response = await fetch(`${defURL}/profile/Squat/${username}`);
             const json = await response.json();
             const datas = json.data;
             const ret = [];
@@ -50,7 +55,7 @@ export default function User() {
 
     const getBenchRecords = async () =>{
         try{
-            const response = await fetch(`${defURL}/profile/BenchPress`);
+            const response = await fetch(`${defURL}/profile/BenchPress/${username}`);
             const json = await response.json();
             const datas = json.data;
             const ret = [];
@@ -66,7 +71,7 @@ export default function User() {
 
     const getDeadRecords = async () =>{
         try{
-            const response = await fetch(`${defURL}/profile/Deadlift`);
+            const response = await fetch(`${defURL}/profile/Deadlift/${username}`);
             const json = await response.json();
             const datas = json.data;
             const ret = [];
@@ -78,7 +83,7 @@ export default function User() {
             console.log(error);
           }
     }
-    let sampleData = [
+    let chartData = [
         {
             seriesName: 'Squat',
             data: squatRecords,
@@ -96,14 +101,15 @@ export default function User() {
         },
     ]
 
-    /*useEffect(()=>{
-        getBaseinfo();
-        getSquatRecords().then(()=>{
-            getBenchRecords().then(()=>{
-                getDeadRecords();
-            })
-        });
-    });*/
+    // useEffect(()=>{
+    //     getBaseinfo();
+    //     getSquatRecords().then(()=>{
+    //         getBenchRecords().then(()=>{
+    //             getDeadRecords();
+    //         })
+    //     });
+    // });
+
     useFocusEffect(
         React.useCallback(() => {
             getBaseinfo();
@@ -139,13 +145,13 @@ export default function User() {
                     <Text style={styles.oneRM__font}>{dead1RM}</Text>
                 </View>
             </View>             
-            {/* <View style={styles.footerBox}>
+            <View style={styles.footerBox}>
                 <PureChart 
-                    data={sampleData} 
+                    data={chartData} 
                     type='line'
                     width={'100%'}
                 />
-            </View> */}
+            </View> 
         </View>
     )
 }
