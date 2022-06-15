@@ -107,7 +107,7 @@ export default function Measure({navigation,route}){
             scrollEnabled={false}
             style={{flex:1,width:400}}
           /> ) 
-          : <ActivityIndicator/>
+          : <ActivityIndicator style={{flex:1}} size='large'/>
         }
         <View style={styles.repBox}>
           <View style={{flex:0.7, flexDirection:"row",alignItems:"center"}}>
