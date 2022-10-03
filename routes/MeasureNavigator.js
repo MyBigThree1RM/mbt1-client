@@ -2,9 +2,9 @@ import React from "react"
 
 import { createStackNavigator } from '@react-navigation/stack';
 
-import  Measure  from '../screens/measure/measure'
-import  Result  from '../screens/measure/result'
-import  Select  from '../screens/measure/select'      
+import  Measure  from '../screens/measure/measure_mode/measure'
+import  Result  from '../screens/measure/measure_mode/result'
+import  Select  from '../screens/measure/measure_mode/select'      
 
 
 const Stack = createStackNavigator();
