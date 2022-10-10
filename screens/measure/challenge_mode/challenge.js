@@ -10,6 +10,7 @@ import { Camera } from 'expo-camera';
 import { WebView } from 'react-native-webview';
 
 import { theme } from "../../../styles/colors.js";
+import { UserInfo } from "../../../App.js";
 
 const PORT = 8000
 const defURL = `http://localhost:${PORT}`
@@ -17,40 +18,26 @@ const defURL = `http://localhost:${PORT}`
 export default function Challenge({navigation,route}){
 
     const ex_event = route.params.ex_event
+    const infos = React.useContext(UserInfo);
   
     const [weight, setWeight] = useState(0);
     const [reps, setReps] = useState(0);
     const [isSubmitted, setIsSubmitted] = useState(false);
-    //const [hasPermission, setHasPermission] = useState(null);
-    //const [type, setType] = useState(Camera.Constants.Type.back);
-  
-    //camera permission
-    /*useEffect(() => {
-      (async () => {
-        const { status } = await Camera.requestCameraPermissionsAsync();
-        setHasPermission(status === 'granted');
-      })();
-    }, []);
-    
-    if (hasPermission === null) {
-      return <View />;
-    }
-    if (hasPermission === false) {
-      return <Text>No access to camera</Text>;
-    }
-    */
-    const paintWeight = () => {
-      if (weight<=0) {
-        alert("The weight must be greater than zero.")
-        setWeight(0);
-        return;
+
+    const [squat1RM, setSquat1RM] = useState(0);
+    const [dead1RM, setDead1RM] = useState(0);
+    const [bench1RM, setBench1RM] = useState(0);
+
+    const paintWeight = async () => {
+      try{
+        const response = await fetch(`${defURL}/profile/Total/${infos.userID}`);
+        const json = await response.json();
+        setSquat1RM(json.data.S);
+        setBench1RM(json.data.B);
+        setDead1RM(json.data.D);
+      } catch (error){
+        console.log(error);
       }
-      else if (weight % 5 !== 0){
-        alert("The weight must be multiple of 5.")
-        setWeight(0);
-        return;
-      }
-      setIsSubmitted(true);
     }
     const onChangeWeight = (w) => setWeight(w);
   
@@ -68,36 +55,31 @@ export default function Challenge({navigation,route}){
       }
     }
 
+    const goBack = () => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Select' }],
+      });
+    }
+
     useFocusEffect(
       React.useCallback(() => {
-        let isActive = true;
-        const req_reps = setInterval(getReps,2000)
+        paintWeight().then(()=>{
+          if(ex_event == 'Squat') {setWeight(squat1RM);}
+          else if(ex_event == 'BenchPress') setWeight(bench1RM);
+          else setWeight(dead1RM);
+        });
+        if(weight != 0) setIsSubmitted(true);
+        
+        const req_reps = setInterval(getReps,2000);
         return () => {
-          clearInterval(req_reps)
-          isActive = false;
+          clearInterval(req_reps);
         };
-      }, [])
+      }, [squat1RM,bench1RM,dead1RM,reps,weight])
     );
   
     return(
       <View style={styles.container}>
-        {/*
-        <Camera style={styles.camera} type={type}>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  setType(
-                    type === Camera.Constants.Type.back
-                      ? Camera.Constants.Type.front
-                      : Camera.Constants.Type.back
-                  );
-                }}>
-                <Text style={styles.text}> Flip </Text>
-              </TouchableOpacity>
-            </View>
-        </Camera>
-        */}
         {isSubmitted ? (
           <WebView
             source={{uri:`${defURL}/${ex_event}`}}
@@ -107,29 +89,22 @@ export default function Challenge({navigation,route}){
             scrollEnabled={false}
             style={{flex:1,width:400}}
           /> ) 
-          : <ActivityIndicator style={{flex:1}} size='large'/>
+          : (<View style = {{flex:1, alignItems:"center", justifyContent:"center"}}>
+            <Text style={{textAlign:"center"}}>측정 기록이 없습니다.{"\n"} 측정을 먼저 진행해 주세요.{"\n"}</Text>
+            <TouchableOpacity
+              onPress={()=>goBack()}
+            >
+              <Text>
+                돌아가기
+              </Text>
+            </TouchableOpacity>
+          </View>)
         }
         <View style={styles.repBox}>
           <View style={{flex:0.7, flexDirection:"row",alignItems:"center"}}>
-            <Text style={styles.repText}>Weight : </Text>
-            <TextInput 
-              onSubmitEditing={paintWeight}
-              onChangeText={onChangeWeight}
-              editable = {!isSubmitted}
-              style={styles.repInput} 
-              keyboardType="number-pad" 
-              returnKeyType="done" />
+            <Text style={styles.repText}>Weight : {weight}</Text>
           </View>
-          <Text style={styles.repText}>REPS : {reps}</Text>
         </View>
-  
-        <TouchableOpacity 
-          style={styles.submit} 
-          onPress={()=>{
-            navigation.navigate('Result',{ex_event:ex_event,weight:weight,reps:reps})
-          }}>
-          <Text style={styles.submit__text}>COMPLETE</Text>
-        </TouchableOpacity>
       </View>
     )
   }
