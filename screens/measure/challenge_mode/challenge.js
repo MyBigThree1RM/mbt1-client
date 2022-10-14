@@ -27,6 +27,15 @@ export default function Challenge({navigation,route}){
     const [squat1RM, setSquat1RM] = useState(0);
     const [dead1RM, setDead1RM] = useState(0);
     const [bench1RM, setBench1RM] = useState(0);
+    
+    const [code,setCode] = useState(0);
+    const [isCodeSubmitted,setCodeSubmitted] = useState(false);
+
+    const paintCode = () =>{
+      setCodeSubmitted(true);
+    }
+
+    const onChangeCode = (w) => setCode(w);
 
     const paintWeight = async () => {
       try{
@@ -98,13 +107,30 @@ export default function Challenge({navigation,route}){
                 돌아가기
               </Text>
             </TouchableOpacity>
-          </View>)
+          </View>) 
         }
         <View style={styles.repBox}>
           <View style={{flex:0.7, flexDirection:"row",alignItems:"center"}}>
-            <Text style={styles.repText}>Weight : {weight}</Text>
+          <Text style={styles.repText}>Gym Code : </Text>
+            <TextInput 
+              onSubmitEditing={paintCode}
+              onChangeText={onChangeCode}
+              editable = {!isCodeSubmitted}
+              style={styles.repInput} 
+              returnKeyType="done" />
           </View>
+          <Text style={styles.repText}>Weight : {weight}</Text>
         </View>
+        <TouchableOpacity 
+          style={styles.submit} 
+          onPress={()=>{
+            if(weight == 0) {alert("측정 기록이 없습니다."); return;}
+            if(reps>=2) {alert("챌린지 모드에서 동작은 한 번만 진행합니다.\n 다시 측정해 주십시오");setReps(0);return;}
+            if(reps<=0) {alert("한 번의 운동동작을 진행해야 합니다."); setReps(0); return;}
+            navigation.navigate('Result',{ex_event:ex_event,weight:weight,gym_code : code})
+          }}>
+          <Text style={styles.submit__text}>COMPLETE</Text>
+        </TouchableOpacity>
       </View>
     )
   }

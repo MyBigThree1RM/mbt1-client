@@ -13,45 +13,13 @@ const defURL = `http://localhost:${PORT}`
 export default function Result({navigation,route}){
     const data = route.params
     const infos = React.useContext(UserInfo);
-  
-    const oneRM = (w,r) => {
-      let best = 0
-      
-      if (r >= 12)  
-          best = w / (0.7)
-      else if (r === 11)
-          best = w / (0.73)
-      else if (r == 10)
-          best = w / (0.75)
-      else if (r == 9
-  )        best = w / (0.77)
-      else if (r == 8
-  )        best = w / (0.80)
-      else if (r == 7
-  )        best = w / (0.83)
-      else if (r == 6
-  )        best = w / (0.85)
-      else if (r == 5
-  )        best = w / (0.87)
-      else if (r == 4
-  )        best = w / (0.90)
-      else if (r == 3
-  )        best = w / (0.93)
-      else if (r == 2
-  )        best = w / (0.95)
-      else if (r == 1
-  )        best = w
-  
-      return Math.round(best)
-    }
 
     const jsonToServer = async () => {
       const result = {
         event : data.ex_event,
         weight : data.weight,
-        reps : data.reps,
-        volume : data.weight * data.reps,
-        oneRM : oneRM(data.weight, data.reps)
+        gym_code : data.gym_code,
+        
       }
       json = JSON.stringify(result);
   
@@ -73,14 +41,12 @@ export default function Result({navigation,route}){
     return(
       <View style={styles.container}>
         <View style = {{flex:1,justifyContent:"center",alignItems:"center"}}>
-          <Text style={{fontSize:30}}>{infos.userID}님 운동결과</Text>
+          <Text style={{fontSize:30}}>{infos.userID}님 챌린지 결과</Text>
         </View>
-        <View style={{...styles.repBox,flex:2}}>
+        <View style={{...styles.repBox,flex:1.5}}>
           <Text style={styles.repText}>Event : {data.ex_event}</Text>
+          <Text style={styles.repText}>Gym Code : {data.gym_code}</Text>
           <Text style={styles.repText}>Weight : {data.weight}</Text>
-          <Text style={styles.repText}>REPS : {data.reps}</Text>
-          <Text style={styles.repText}>Volume : {data.weight * data.reps}</Text>
-          <Text style={styles.repText}>Estimated 1RM : {oneRM(data.weight,data.reps)}</Text>
         </View>
         <TouchableOpacity 
           style={styles.submit} 
@@ -129,11 +95,11 @@ export default function Result({navigation,route}){
       fontSize:20,
     },
     submit:{
-      flex:0.05,
+      flex:0.35,
       width:"90%",
       alignItems:"center",
       justifyContent:"center",
-      paddingVertical:20,
+      paddingVertical:-10,
       marginBottom:20,
       borderRadius:20,
       backgroundColor:"navy"
