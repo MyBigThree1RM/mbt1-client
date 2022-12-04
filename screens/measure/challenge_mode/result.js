@@ -18,12 +18,11 @@ export default function Result({navigation,route}){
       const result = {
         event : data.ex_event,
         weight : data.weight,
-        gym_code : data.gym_code,
-        
+        gym_code : data.gym_code  
       }
       json = JSON.stringify(result);
   
-      fetch(`${defURL}/result/${infos.userID}`,{
+      fetch(`${defURL}/challenge_result/${infos.userID}`,{
         method: 'POST',
         headers: {
           Accept: 'application/json',

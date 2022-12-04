@@ -21,6 +21,13 @@ export default function Measure({navigation,route}){
     const [weight, setWeight] = useState(0);
     const [reps, setReps] = useState(0);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    // const [code,setCode] = useState(0);
+    const [isCodeSubmitted,setCodeSubmitted] = useState(false);
+    const paintCode = () =>{
+      setCodeSubmitted(true);
+    }
+
+    // const onChangeCode = (w) => setCode(w);
     //const [hasPermission, setHasPermission] = useState(null);
     //const [type, setType] = useState(Camera.Constants.Type.back);
   
@@ -71,7 +78,7 @@ export default function Measure({navigation,route}){
     useFocusEffect(
       React.useCallback(() => {
         let isActive = true;
-        const req_reps = setInterval(getReps,2000)
+        const req_reps = setInterval(getReps,500)
         return () => {
           clearInterval(req_reps)
           isActive = false;
@@ -111,6 +118,14 @@ export default function Measure({navigation,route}){
         }
         <View style={styles.repBox}>
           <View style={{flex:0.7, flexDirection:"row",alignItems:"center"}}>
+            {/* <Text style={styles.repText}>Gym Code : </Text>
+            <TextInput 
+              onSubmitEditing={paintCode}
+              onChangeText={onChangeCode}
+              editable = {!isCodeSubmitted}
+              style={styles.repInput} 
+              keyboardType="number-pad" 
+              returnKeyType="done" /> */}
             <Text style={styles.repText}>Weight : </Text>
             <TextInput 
               onSubmitEditing={paintWeight}
