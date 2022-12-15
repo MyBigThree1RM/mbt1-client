@@ -24,38 +24,37 @@ export default function Challenge({navigation,route}){
     const [reps, setReps] = useState(0);
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const [username, setUsername] = useState(infos.userID);
+    const [squat1RM, setSquat1RM] = useState(0);
+    const [dead1RM, setDead1RM] = useState(0);
+    const [bench1RM, setBench1RM] = useState(0);
+    
     const [code,setCode] = useState(0);
     const [isCodeSubmitted,setCodeSubmitted] = useState(false);
 
     const paintCode = () =>{
-      paintWeight();
       setCodeSubmitted(true);
     }
 
     const onChangeCode = (w) => setCode(w);
+	  const [infRes, setInfRes] = React.useState(0);
+
+	  const inferenceResult = async () => {
+      try{
+        const response = await fetch(`http://localhost:8501/v1/models/test_model:predict`);
+        const json = await response.json();
+        setInfRes(json.data.predictions);
+      } catch (error){
+        console.log(error);
+      }
+    }
 
     const paintWeight = async () => {
       try{
-        const response = await fetch(`${defURL}/profile/Total/${username}`);
+        const response = await fetch(`${defURL}/profile/Total/${infos.userID}`);
         const json = await response.json();
-        if(ex_event == 'Squat') {
-          setWeight(json.data.S);
-          if(json.data.S > 0) {
-            setIsSubmitted(true);
-          }
-        } else if(ex_event == 'BenchPress') {
-          setWeight(json.data.B);
-          if(json.data.B > 0) {
-            setIsSubmitted(true);
-          }
-        } else if(ex_event == 'Deadlift') {
-          setWeight(json.data.D);
-          if(json.data.D > 0) {
-            setIsSubmitted(true);
-          }
-        }
-
+        setSquat1RM(json.data.S);
+        setBench1RM(json.data.B);
+        setDead1RM(json.data.D);
       } catch (error){
         console.log(error);
       }
@@ -85,15 +84,20 @@ export default function Challenge({navigation,route}){
 
     useFocusEffect(
       React.useCallback(() => {
-        let isActive = true;
-        const req_reps = setInterval(getReps,500)
+        paintWeight().then(()=>{
+          if(ex_event == 'Squat') {setWeight(squat1RM);}
+          else if(ex_event == 'BenchPress') setWeight(bench1RM);
+          else setWeight(dead1RM);
+        });
+        if(weight != 0) setIsSubmitted(true);
+        
+        const req_reps = setInterval(getReps,2000);
         return () => {
-          clearInterval(req_reps)
-          isActive = false;
+          clearInterval(req_reps);
         };
-      }, [])
+      }, [squat1RM,bench1RM,dead1RM,reps,weight])
     );
-
+  
     return(
       <View style={styles.container}>
         {isSubmitted ? (
@@ -132,8 +136,9 @@ export default function Challenge({navigation,route}){
           style={styles.submit} 
           onPress={()=>{
             if(weight == 0) {alert("측정 기록이 없습니다."); return;}
-            // if(reps>=2) {alert("챌린지 모드에서 동작은 한 번만 진행합니다.\n 다시 측정해 주십시오");setReps(0);return;}
-            // if(reps<=0) {alert("한 번의 운동동작을 진행해야 합니다."); setReps(0); return;}
+            if(reps>=2) {alert("챌린지 모드에서 동작은 한 번만 진행합니다.\n 다시 측정해 주십시오");setReps(0);return;}
+            if(reps<=0) {alert("한 번의 운동동작을 진행해야 합니다."); setReps(0); return;}
+            if(infRes*100 < 50) {alert("챌린지 실패"); goBack(); return;}
             navigation.navigate('Result',{ex_event:ex_event,weight:weight,gym_code : code})
           }}>
           <Text style={styles.submit__text}>COMPLETE</Text>
@@ -214,4 +219,3 @@ export default function Challenge({navigation,route}){
       color: 'white',
     },
   });
-  
